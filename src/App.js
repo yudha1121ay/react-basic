@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Navbar, NavbarBrand } from 'reactstrap';
 import Menu from './components/MenuComponent';
+import Dishdetail from './components/DishDetailComponents';
 import { Dishes } from './components/shared/Dishes';
 
 
@@ -11,8 +12,12 @@ class App extends Component {
     super(props);
     this.state = {
       dishes: Dishes,
-      commentDishes: Dishes.comments
+      selectedDish: null
     };
+  }
+
+  onDishSelected(dishId) {
+    this.setState({ selectedDish: dishId });
   }
 
   render() {
@@ -23,7 +28,11 @@ class App extends Component {
             <NavbarBrand href="/">Ristorante Con Fusion</NavbarBrand>
           </div>
         </Navbar>
-        <Menu dishes={this.state.dishes} />
+        <Menu
+          dishes={this.state.dishes}
+          onClick={(dishId) => this.onDishSelected(dishId)} />
+        <Dishdetail
+          selectedDish={this.state.dishes.filter((dish) => dish.id === this.state.selectedDish)[0]} />
       </div>
     );
   }
