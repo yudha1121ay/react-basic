@@ -10,7 +10,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      dishes: Dishes
+      dishes: Dishes,
+      commentDishes: Dishes.comments
     };
   }
 

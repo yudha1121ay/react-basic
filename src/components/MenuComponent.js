@@ -8,7 +8,12 @@ class Menu extends Component {
         super(props);
         this.state = {
             selectedDish: null
-        };
+        }
+        console.log('Menu Component constructor is invoked');
+    }
+
+    componentDidMount() {
+        console.log('Menu Component componentDidMount is invoked');
     }
 
     onDishSelect(dish) {
@@ -26,10 +31,32 @@ class Menu extends Component {
                     </CardBody>
                 </Card>
             );
+        }
+    }
+
+    renderComment(dish) {
+        if (dish != null) {
+            let options = { year: 'numeric', month: 'short', day: 'numeric' };
+            console.log(dish.comments);
+            const dishComments = dish.comments.map((comment, index) => {
+                return (
+                    <div key={index}>
+                        <p>{comment.comment}</p>
+                        <p>-- {comment.author}, <span>{new Date(comment.date).toLocaleDateString("en-US", options)}</span></p>
+                    </div>
+                );
+            });
+            return (
+                <div>
+                    <h4>Comments</h4>
+                    {dishComments}
+                </div>
+            )
+
         } else {
             return (
                 <div></div>
-            );
+            )
         }
     }
 
@@ -48,13 +75,20 @@ class Menu extends Component {
             );
         });
 
+        console.log('Menu Component render is invoked');
+
         return (
             <div className="container" >
                 <div className="row">
                     {menu}
                 </div>
                 <div className="row">
-                    {this.renderDish(this.state.selectedDish)}
+                    <div className="col-md-5 m-1">
+                        {this.renderDish(this.state.selectedDish)}
+                    </div>
+                    <div className="col-md-5 m-1">
+                        {this.renderComment(this.state.selectedDish)}
+                    </div>
                 </div>
             </div>
         );
