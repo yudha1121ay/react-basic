@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
-import { Card, CardImg, CardText, CardBody, Col, CardTitle, Breadcrumb, BreadcrumbItem, Button, Modal, ModalBody, ModalHeader, Label, Row } from 'reactstrap'
+import { Card, CardImg, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbItem, Button, Modal, ModalBody, ModalHeader, Label, Row } from 'reactstrap'
 import { Link } from 'react-router-dom';
 import { Control, LocalForm, Errors } from 'react-redux-form';
+import { Loading } from './LoadingComponent';
+import { baseUrl } from '../shared/baseUrl';
 
 
 function Dish({ dish }) {
     if (dish != null) {
         return (
             <Card>
-                <CardImg width="100%" src={dish.image} alt={dish.name} />
+                <CardImg width="100%" src={baseUrl + dish.image} alt={dish.name} />
                 <CardBody>
                     <CardTitle>{dish.name}</CardTitle>
                     <CardText>{dish.description}</CardText>
@@ -22,7 +24,7 @@ function Dish({ dish }) {
     }
 }
 
-function Comment({ comments }) {
+function Comment({ comments, postComments, dishId }) {
     if (comments != null) {
         let options = { year: 'numeric', month: 'short', day: 'numeric' };
         return (
@@ -36,6 +38,7 @@ function Comment({ comments }) {
                         </div>
                     );
                 })}
+                <CommentForm dishId={dishId} postComments={postComments} />
             </>
         )
 
@@ -49,23 +52,15 @@ function Comment({ comments }) {
 const maxLength = (len) => (val) => !(val) || (val.length <= len);
 const minLength = (len) => (val) => (val) && (val.length >= len);
 
-class Dishdetail extends Component {
+class CommentForm extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            isNavOpen: false,
             isModalOpen: false
         };
-        this.toggleNav = this.toggleNav.bind(this);
         this.toggleModal = this.toggleModal.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-    }
-
-    toggleNav() {
-        this.setState({
-            isNavOpen: !this.state.isNavOpen
-        });
     }
 
     toggleModal() {
@@ -75,36 +70,15 @@ class Dishdetail extends Component {
     }
 
     handleSubmit(values) {
-        alert("Current state is: " + JSON.stringify(values))
+        this.props.postComments(this.props.dishId, values.rating, values.author, values.comment)
     }
 
     render() {
         return (
             <>
-                <div className="container">
-                    <div className="row">
-                        <Breadcrumb>
-                            <BreadcrumbItem><Link to="/menu" />Menu</BreadcrumbItem>
-                            <BreadcrumbItem active>{this.props.dish.name}</BreadcrumbItem>
-                        </Breadcrumb>
-                        <div className="col-12">
-                            <h3>{this.props.dish.name}</h3>
-                            <hr />
-                        </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-12 col-md-5 m-1">
-                            <Dish dish={this.props.dish} />
-                        </div>
-
-                        <div className="col-12 col-md-5 m-1">
-                            <Comment comments={this.props.comment} />
-                            <Button outline onClick={this.toggleModal}>
-                                <span className="fa fa-pencil fa-lg"></span> Submit Comment
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+                <Button outline onClick={this.toggleModal}>
+                    <span className="fa fa-pencil fa-lg"></span> Submit Comment
+                </Button>
                 <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
                     <ModalHeader toggle={this.toggleModal}>Submit Comment</ModalHeader>
                     <ModalBody className="ml-3 mr-3">
@@ -121,17 +95,17 @@ class Dishdetail extends Component {
                                 </Control.select>
                             </Row>
                             <Row className="form-group">
-                                <Label htmlFor="username">Username</Label>
+                                <Label htmlFor="author">Author</Label>
                                 <Control.text
                                     className="form-control"
-                                    model=".username"
-                                    id="username"
-                                    name="username"
-                                    placeholder="Username"
+                                    model=".author"
+                                    id="author"
+                                    name="author"
+                                    placeholder="Author..."
                                     validators={{ minLength: minLength(3), maxLength: maxLength(15) }} />
                                 <Errors
                                     className="text-danger"
-                                    model=".username"
+                                    model=".author"
                                     show="touched"
                                     messages={{
                                         minLength: 'This field can be filled with minimum 3 characters',
@@ -139,7 +113,7 @@ class Dishdetail extends Component {
                                     }} />
                             </Row>
                             <Row className="form-group">
-                                <Label htmlFor="comment">Username</Label>{''}
+                                <Label htmlFor="comment">Comment</Label>{''}
                                 <Control.textarea
                                     rows="6"
                                     className="form-control"
@@ -155,6 +129,53 @@ class Dishdetail extends Component {
                     </ModalBody>
                 </Modal>
             </>
+        )
+    }
+}
+
+const Dishdetail = (props) => {
+    if (props.isLoading) {
+        return (
+            <div className="container">
+                <div className="row">
+                    <Loading />
+                </div>
+            </div>
+        );
+    } else if (props.errMess) {
+        return (
+            <div className="container">
+                <div className="row">
+                    <h2>{props.errMess}</h2>
+                </div>
+            </div>
+        );
+    } else if (props.dish != null) {
+        return (
+            <div className="container">
+                <div className="row">
+                    <Breadcrumb>
+                        <BreadcrumbItem><Link to="/menu" >Menu</Link></BreadcrumbItem>
+                        <BreadcrumbItem active>{props.dish.name}</BreadcrumbItem>
+                    </Breadcrumb>
+                    <div className="col-12">
+                        <h3>{props.dish.name}</h3>
+                        <hr />
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-12 col-md-5 m-1">
+                        <Dish dish={props.dish} />
+                    </div>
+
+                    <div className="col-12 col-md-5 m-1">
+                        <Comment
+                            comments={props.comment}
+                            postComments={props.postComments}
+                            dishId={props.dish.id} />
+                    </div>
+                </div>
+            </div>
         );
     }
 }
