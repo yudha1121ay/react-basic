@@ -18,7 +18,8 @@ class Contact extends Component {
     }
 
     handleSubmit(values) {
-        alert("Current state is: " + JSON.stringify(values))
+        alert("Thank you for your feedback! \n" + JSON.stringify(values))
+        this.props.postFeedback(values.firstname, values.lastname, values.telnum, values.email, values.agree, values.contactType, values.message)
         this.props.resetFeedbackForm();
     }
 
@@ -70,12 +71,12 @@ class Contact extends Component {
                             <Row className="form-group">
                                 <Label htmlFor="firstname" md={2}>First Name</Label>
                                 <Col md={10}>
-                                    <Control.text model=".firstName" id="firstname" name="firstName" placeholder="First Name"
+                                    <Control.text model=".firstname" id="firstname" name="firstname" placeholder="First Name"
                                         className="form-control"
                                         validators={{ Required, minLength: minLength(3), maxLength: maxLength(15) }} />
                                     <Errors
                                         className="text-danger"
-                                        model=".firstName"
+                                        model=".firstname"
                                         show="touched"
                                         messages={{
                                             Required: 'Required',
@@ -87,12 +88,12 @@ class Contact extends Component {
                             <Row className="form-group">
                                 <Label htmlFor="lastname" md={2}>Last Name</Label>
                                 <Col md={10}>
-                                    <Control.text model=".lastName" id="lastname" name="lastName" placeholder="Last Name"
+                                    <Control.text model=".lastname" id="lastname" name="lastname" placeholder="Last Name"
                                         className="form-control"
                                         validators={{ Required, minLength: minLength(3), maxLength: maxLength(15) }} />
                                     <Errors
                                         className="text-danger"
-                                        model=".lastName"
+                                        model=".lastname"
                                         show="touched"
                                         messages={{
                                             Required: 'Required',
@@ -138,7 +139,7 @@ class Contact extends Component {
                                 <Col md={{ size: 6, offset: 2 }}>
                                     <div className="form-check">
                                         <Label check>
-                                            <Control.checkbox model=".accept" name="accept"
+                                            <Control.checkbox model=".agree" name="agree"
                                                 className="form-check-input" /> {''}
                                             <strong>May we contact you ?</strong>
                                         </Label>

@@ -2,31 +2,64 @@ import React from 'react';
 import { Breadcrumb, BreadcrumbItem, Card, CardBody, CardHeader, Media } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { baseUrl } from '../shared/baseUrl';
+import { Loading } from './LoadingComponent';
+import { Fade, Stagger } from 'react-animation-components';
 
 
-function About(props) {
+function RenderLeader({ leader }) {
+    return (
+        <Media tag="li">
+            <Media left middle>
+                <Media object src={baseUrl + leader.image} alt={leader.name} />
+            </Media>
+            <Media body className="ml-5">
+                <Media heading>{leader.name}</Media>
+                <p>{leader.designation}</p>
+                <p>{leader.description}</p>
+            </Media>
+        </Media>
+    );
 
-    const leader = props.leaders.map((leader) => {
+}
+
+function LeaderList(props) {
+    const leaders = props.leaders.leaders.map((leader) => {
         return (
-            <div key={leader.id} className="mt-5">
-                <div className="row">
-                    <div className="col-2">
-                        <Media left>
-                            <Media object src={baseUrl + leader.image} alt={leader.name} />
-                        </Media>
-                    </div>
-                    <div className="col-9">
-                        <Media body>
-                            <Media heading>{leader.name}</Media>
-                            <p>{leader.designation}</p>
-                            <p>{leader.description}</p>
-                        </Media>
-                    </div>
+            <Fade in key={leader.id}>
+                <div className="col-12 mt-3">
+                    <RenderLeader leader={leader} />
                 </div>
-            </div >
+            </Fade>
         );
     });
 
+    if (props.leaders.isLoading) {
+        return (
+            <div className="col-12">
+                <Loading />
+            </div>
+        );
+    }
+    else if (props.leaders.errMess) {
+        return (
+            <div className="col-12">
+                <h4>{props.leaders.errMess}</h4>
+            </div>
+        );
+    }
+    else {
+        return (
+            <Media list>
+                <Stagger in>
+                    {leaders}
+                </Stagger>
+            </Media>
+        );
+    }
+}
+
+
+function About(props) {
     return (
         <div className="container">
             <div className="row">
@@ -42,7 +75,7 @@ function About(props) {
             <div className="row row-content">
                 <div className="col-12 col-md-6">
                     <h2>Our History</h2>
-                    <p>Started in 2010, Ristorante con Fusion quickly established itself as a culinary icon par excellence in Hong Kong. With its unique brand of world fusion cuisine that can be found nowhere else, it enjoys patronage from the A-list clientele in Hong Kong.  Featuring four of the best three-star Michelin chefs in the world, you never know what will arrive on your plate the next time you visit us.</p>
+                    <p>Started in 2010, Our Restaurant is quickly established itself as a culinary icon par excellence in India. With its unique brand of world fusion cuisine that can be found nowhere else, it enjoys patronage from the A-list clientele in India.  Featuring four of the best three-star Michelin chefs in the world, you never know what will arrive on your plate the next time you visit us.</p>
                     <p>The restaurant traces its humble beginnings to <em>The Frying Pan</em>, a successful chain started by our CEO, Mr. Peter Pan, that featured for the first time the world's best cuisines in a pan.</p>
                 </div>
                 <div className="col-12 col-md-5">
@@ -53,7 +86,7 @@ function About(props) {
                                 <dt className="col-6">Started</dt>
                                 <dd className="col-6">3 Feb. 2013</dd>
                                 <dt className="col-6">Major Stake Holder</dt>
-                                <dd className="col-6">HK Fine Foods Inc.</dd>
+                                <dd className="col-6">IN Fine Foods Inc.</dd>
                                 <dt className="col-6">Last Year's Turnover</dt>
                                 <dd className="col-6">$1,250,375</dd>
                                 <dt className="col-6">Employees</dt>
@@ -81,12 +114,13 @@ function About(props) {
                 <div className="col-12">
                     <h2>Corporate Leadership</h2>
                 </div>
-                <Media list>
-                    {leader}
-                </Media>
+                <div className="col-12">
+                    <LeaderList leaders={props.leaders} />
+                </div>
             </div>
         </div>
     );
 }
+
 
 export default About;
